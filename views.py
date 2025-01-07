@@ -1,3 +1,4 @@
+from tkinter import ttk
 from services import FacturacionService
 import tkinter as tk
 from tkinter import messagebox
@@ -76,29 +77,20 @@ class FacturacionView:
         # Aquí puedes agregar campos para seleccionar cliente y perfumes, y un botón para crear la factura
 
     def mostrar_ver_factura(self):
-        # Ventana para ver factura
+        # Crear una ventana para mostrar las facturas
         ventana = tk.Toplevel()
-        ventana.title("Ver Factura")
+        ventana.title("Ver Facturas")
 
-        # Aquí puedes agregar lógica para mostrar las facturas existentes
+        # Crear un Treeview para mostrar las facturas en una tabla
+        tree = ttk.Treeview(ventana, columns=("ID", "Cliente", "Total"), show="headings")
+        tree.heading("ID", text="ID")
+        tree.heading("Cliente", text="Cliente")
+        tree.heading("Total", text="Total")
+        tree.pack(fill="both", expand=True)
 
-    def mostrar_eliminar_factura(self):
-        # Ventana para eliminar factura
-        ventana = tk.Toplevel()
-        ventana.title("Eliminar Factura")
+        # Obtener todas las facturas del servicio
+        facturas = self.service.obtener_todas_las_facturas()
 
-        tk.Label(ventana, text="ID de la factura:").grid(row=0, column=0, padx=10, pady=10)
-        entry_id = tk.Entry(ventana)
-        entry_id.grid(row=0, column=1, padx=10, pady=10)
-
-        def eliminar_factura():
-            try:
-                factura_id = int(entry_id.get())
-                self.service.eliminar_factura(factura_id)
-                messagebox.showinfo("Éxito", "Factura eliminada correctamente.")
-                ventana.destroy()
-            except ValueError:
-                messagebox.showwarning("Advertencia", "Por favor, ingrese un ID válido.")
-
-        btn_eliminar = tk.Button(ventana, text="Eliminar", command=eliminar_factura)
-        btn_eliminar.grid(row=1, columnspan=2, pady=10)
+        # Agregar las facturas al Treeview
+        for factura in facturas:
+            tree.insert("", "end", values=(factura["id"], factura["cliente"], factura["total"]))

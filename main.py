@@ -32,9 +32,6 @@ def main():
     btn_ver_factura = tk.Button(root, text="Ver Factura", command=facturacion_view.mostrar_ver_factura)
     btn_ver_factura.pack(pady=10)
 
-    btn_eliminar_factura = tk.Button(root, text="Eliminar Factura", command=facturacion_view.mostrar_eliminar_factura)
-    btn_eliminar_factura.pack(pady=10)
-
     root.mainloop()
 
 if __name__ == "__main__":

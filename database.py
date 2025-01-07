@@ -22,11 +22,11 @@ def inicializar_db(db: sqlite3.Connection):
     ''')
     db.execute('''
         CREATE TABLE IF NOT EXISTS Facturas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cliente_id INTEGER,
-            total REAL,
-            FOREIGN KEY(cliente_id) REFERENCES Clientes(id)
-        )
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cliente_id INTEGER,
+    total REAL,
+    FOREIGN KEY(cliente_id) REFERENCES Clientes(id)
+);
     ''')
     db.execute('''
         CREATE TABLE IF NOT EXISTS DetallesFactura (

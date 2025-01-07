@@ -54,11 +54,20 @@ class FacturacionService:
         if factura:
             return Factura(cliente=None, total=factura[2])  # Ajusta según tu modelo
         return None
-
-    def eliminar_factura(self, factura_id: int):
+    
+    def obtener_todas_las_facturas(self):
         cursor = self.db.cursor()
         cursor.execute('''
-            DELETE FROM Facturas WHERE id = ?
-        ''', (factura_id,))
-        self.db.commit()
-        print("Factura eliminada correctamente.")
+            SELECT Facturas.id, Clientes.nombre, Facturas.total
+            FROM Facturas
+            LEFT JOIN Clientes ON Facturas.cliente_id = Clientes.id
+        ''')
+        facturas = cursor.fetchall()
+        return [
+            {
+                "id": factura[0],
+                "cliente": factura[1] if factura[1] else "Cliente no especificado",
+                "total": factura[2]
+            }
+            for factura in facturas
+        ]
