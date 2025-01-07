@@ -1,0 +1,24 @@
+from sqlite3 import Connection
+
+class Cliente:
+    def __init__(self, nombre: str = None, telefono: str = None, habitual: bool = False):
+        self.nombre = nombre
+        self.telefono = telefono
+        self.habitual = habitual
+
+class Perfume:
+    def __init__(self, nombre: str, precio: float):
+        self.nombre = nombre
+        self.precio = precio
+
+class Factura:
+    def __init__(self, cliente: Cliente = None, total: float = 0):
+        self.cliente = cliente
+        self.total = total
+
+class DetalleFactura:
+    def __init__(self, factura_id: int, perfume_id: int, cantidad: int, precio: float):
+        self.factura_id = factura_id
+        self.perfume_id = perfume_id
+        self.cantidad = cantidad
+        self.precio = precio
