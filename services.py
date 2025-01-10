@@ -14,13 +14,85 @@ class FacturacionService:
         self.db.commit()
         print("Cliente agregado correctamente.")
 
-    def agregar_perfume(self, perfume: Perfume):
+    def obtener_todos_los_clientes(self):  # Cambia el nombre del método
+        cursor = self.db.cursor()
+        cursor.execute('''
+            SELECT id, nombre, telefono, habitual
+            FROM Clientes
+    ''')  # Sin condición WHERE
+        clientes = cursor.fetchall()
+        return [
+        {
+            "id": cliente[0],
+            "nombre": cliente[1],
+            "telefono": cliente[2],
+            "habitual": "Sí" if cliente[3] else "No"  # Convertir a texto
+        }
+        for cliente in clientes
+    ]
+
+    def eliminar_cliente(self, cliente_id: int):
         try:
             cursor = self.db.cursor()
             cursor.execute('''
-                INSERT INTO Perfumes (nombre, precio)
-                VALUES (?, ?)
-            ''', (perfume.nombre, perfume.precio))
+                DELETE FROM Clientes
+                WHERE id = ?
+            ''', (cliente_id,))
+            self.db.commit()
+            print(f"Cliente con ID {cliente_id} eliminado correctamente.")
+        except Exception as e:
+            print(f"Error al eliminar cliente: {e}")
+
+    def editar_cliente(self, cliente_id: int, nombre: str, telefono: str, habitual: str):
+        try:
+            cursor = self.db.cursor()
+            cursor.execute('''
+                UPDATE Clientes
+                SET nombre = ?, telefono = ?, habitual = ?
+                WHERE id = ?
+            ''', (nombre, telefono, habitual, cliente_id))
+            self.db.commit()
+            print(f"Cliente con ID {cliente_id} editado correctamente.")
+        except Exception as e:
+            print(f"Error al editar cliente: {e}")
+
+    def obtener_cliente_por_id(self, cliente_id: int):
+        cursor = self.db.cursor()
+        cursor.execute('''
+            SELECT id, nombre, telefono, habitual
+            FROM Clientes
+            WHERE id = ?
+        ''', (cliente_id,))
+        cliente = cursor.fetchone()
+        if cliente:
+            return {
+                "id": cliente[0],
+                "nombre": cliente[1],
+                "telefono": cliente[2],
+                "habitual": "Sí" if cliente[3] else "No"  # Convertir a texto
+            }
+        return None
+
+    def editar_cliente(self, cliente_id: int, nombre: str, telefono: str, habitual: str):  # Asegúrate de que esté dentro de la clase
+        try:
+            cursor = self.db.cursor()
+            cursor.execute('''
+                UPDATE Clientes
+                SET nombre = ?, telefono = ?, habitual = ?
+                WHERE id = ?
+            ''', (nombre, telefono, habitual, cliente_id))
+            self.db.commit()
+            print(f"Cliente con ID {cliente_id} editado correctamente.")
+        except Exception as e:
+            print(f"Error al editar cliente: {e}")
+
+    def agregar_perfume(self, perfume: Perfume):  # Asegúrate de que esté dentro de la clase
+        try:
+            cursor = self.db.cursor()
+            cursor.execute('''
+                INSERT INTO Perfumes (nombre, precio, stock)
+                VALUES (?, ?, ?)
+            ''', (perfume.nombre, perfume.precio, perfume.stock))
             self.db.commit()
             print("Perfume agregado correctamente.")
         except Exception as e:

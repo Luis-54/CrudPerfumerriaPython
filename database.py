@@ -13,11 +13,13 @@ def inicializar_db(db: sqlite3.Connection):
             habitual BOOLEAN
         )
     ''')
+def inicializar_db(db: sqlite3.Connection):
     db.execute('''
         CREATE TABLE IF NOT EXISTS Perfumes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT,
-            precio REAL
+            precio REAL,
+            stock INTEGER  -- Nueva columna para el stock
         )
     ''')
     db.execute('''

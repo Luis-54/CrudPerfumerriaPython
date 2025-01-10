@@ -7,9 +7,10 @@ class Cliente:
         self.habitual = habitual
 
 class Perfume:
-    def __init__(self, nombre: str, precio: float):
+    def __init__(self, nombre: str, precio: float, stock: int = 0):  # Agregar stock
         self.nombre = nombre
         self.precio = precio
+        self.stock = stock
 
 class Factura:
     def __init__(self, cliente: Cliente = None, total: float = 0):
