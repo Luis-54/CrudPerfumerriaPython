@@ -116,6 +116,49 @@ class FacturacionService:
         for perfume in perfumes
     ]
 
+    def editar_perfume(self, perfume_id: int, nombre: str, precio: float, stock: int):
+        try:
+            cursor = self.db.cursor()
+            cursor.execute('''
+                UPDATE Perfumes
+                SET nombre = ?, precio = ?, stock = ?
+                WHERE id = ?
+        ''', (nombre, precio, stock, perfume_id))
+            self.db.commit()
+            print(f"Perfume con ID {perfume_id} editado correctamente.")
+        except Exception as e:
+            print(f"Error al editar perfume: {e}")
+
+
+    def obtener_perfume_por_id(self, perfume_id: int):
+        cursor = self.db.cursor()
+        cursor.execute('''
+            SELECT id, nombre, precio, stock
+            FROM Perfumes
+            WHERE id = ?
+        ''', (perfume_id,))
+        perfume = cursor.fetchone()
+        if perfume:
+            return {
+                "id": perfume[0],
+                "nombre": perfume[1],
+                "precio": perfume[2],
+                "stock": perfume[3]
+            }
+        return None
+
+    def eliminar_perfume(self, perfume_id: int):
+        try:
+            cursor = self.db.cursor()
+            cursor.execute('''
+                DELETE FROM Perfumes
+                WHERE id = ?
+            ''', (perfume_id,))
+            self.db.commit()
+            print(f"Perfume con ID {perfume_id} eliminado correctamente.")
+        except Exception as e:
+            print(f"Error al eliminar perfume: {e}")
+
     def crear_factura(self, factura: Factura, detalles: list[DetalleFactura]):
         cursor = self.db.cursor()
         # Insertar la factura

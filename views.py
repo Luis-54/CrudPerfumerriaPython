@@ -265,20 +265,25 @@ class FacturacionView:
         tk.Label(ventana_editar, text="Stock:").grid(row=2, column=0)
         entry_stock = tk.Entry(ventana_editar)
         entry_stock.grid(row=2, column=1)
-        entry_stock.insert(0, perfume["stock"])
+        if perfume["stock"] is not None:
+            entry_stock.insert(0, perfume["stock"])
+        else:
+            entry_stock.insert(0, "0")  # Insertar un valor por defecto si es None
 
         # Función para guardar los cambios
         def guardar_cambios():
             nuevo_nombre = entry_nombre.get()
-            nuevo_precio = entry_precio.get()
-            nuevo_stock = entry_stock.get()
+            nuevo_precio = float(entry_precio.get())
+            nuevo_stock = int(entry_stock.get())
             self.service.editar_perfume(perfume_id, nuevo_nombre, nuevo_precio, nuevo_stock)
             messagebox.showinfo("Éxito", "Perfume actualizado correctamente.")
             ventana_editar.destroy()  # Cerrar la ventana de edición
             self.mostrar_todos_los_perfumes()  # Actualizar la tabla de perfumes
 
         btn_guardar = tk.Button(ventana_editar, text="Guardar Cambios", command=guardar_cambios)
-        btn_guardar.grid(row=3, columnspan=2, pady=10)
+        btn_guardar.grid(row=3, columnspan=2)
+
+        ventana_editar.mainloop()
 
     def mostrar_crear_factura(self):
         # Ventana para crear factura
