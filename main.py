@@ -1,10 +1,8 @@
 from database import conectar_db, inicializar_db
 from models import Cliente, Perfume, Factura, DetalleFactura
 from services import FacturacionService
-from views import FacturacionService
-import tkinter as tk
 from views import FacturacionView
-
+import tkinter as tk
 
 def main():
     # Conectar a la base de datos e inicializarla
@@ -28,6 +26,9 @@ def main():
 
     btn_agregar_perfume = tk.Button(root, text="Agregar Perfume", command=facturacion_view.mostrar_agregar_perfume)
     btn_agregar_perfume.pack(pady=10)
+
+    btn_perfumes = tk.Button(root, text="Gestionar Perfumes", command=facturacion_view.mostrar_todos_los_perfumes)
+    btn_perfumes.pack(pady=10)
 
     btn_crear_factura = tk.Button(root, text="Crear Factura", command=facturacion_view.mostrar_crear_factura)
     btn_crear_factura.pack(pady=10)

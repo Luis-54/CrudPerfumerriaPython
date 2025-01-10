@@ -98,6 +98,24 @@ class FacturacionService:
         except Exception as e:
             print(f"Error al agregar perfume: {e}")
 
+    def obtener_todos_los_perfumes(self):
+        cursor = self.db.cursor()
+        cursor.execute('''
+        SELECT id, nombre, precio, stock
+        FROM Perfumes
+    ''')  # Sin condición WHERE
+        perfumes = cursor.fetchall()
+        print("Perfumes obtenidos de la base de datos:", perfumes)  # Depuración
+        return [
+        {
+            "id": perfume[0],
+            "nombre": perfume[1],
+            "precio": perfume[2],
+            "stock": perfume[3]
+        }
+        for perfume in perfumes
+    ]
+
     def crear_factura(self, factura: Factura, detalles: list[DetalleFactura]):
         cursor = self.db.cursor()
         # Insertar la factura

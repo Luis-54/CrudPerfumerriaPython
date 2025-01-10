@@ -180,6 +180,106 @@ class FacturacionView:
         btn_agregar = tk.Button(ventana, text="Agregar", command=agregar_perfume)
         btn_agregar.grid(row=3, columnspan=2, pady=10)
 
+    def mostrar_todos_los_perfumes(self):
+        # Crear una ventana para mostrar todos los perfumes
+        ventana = tk.Toplevel()
+        ventana.title("Todos los Perfumes")
+
+        # Crear un Treeview para mostrar los perfumes en una tabla
+        tree = ttk.Treeview(ventana, columns=("ID", "Nombre", "Precio", "Stock"), show="headings")
+        tree.heading("ID", text="ID")
+        tree.heading("Nombre", text="Nombre")
+        tree.heading("Precio", text="Precio")
+        tree.heading("Stock", text="Stock")
+        tree.pack(fill="both", expand=True)
+
+        # Obtener los perfumes de la base de datos
+        perfumes = self.service.obtener_todos_los_perfumes()
+
+        # Agregar los perfumes al Treeview
+        for perfume in perfumes:
+            id_perfume = perfume["id"]
+            nombre = perfume["nombre"]
+            precio = perfume["precio"] if perfume["precio"] is not None else 0.0
+            stock = perfume["stock"] if perfume["stock"] is not None else 0
+            tree.insert("", "end", values=(id_perfume, nombre, precio, stock))
+
+    # Botón para eliminar perfume
+        def eliminar_perfume():
+            seleccionado = tree.selection()  # Obtener el perfume seleccionado
+            if seleccionado:
+                perfume_id = tree.item(seleccionado, "values")[0]  # Obtener el ID del perfume
+                self.service.eliminar_perfume(perfume_id)  # Llamar al servicio para eliminar
+                messagebox.showinfo("Éxito", "Perfume eliminado correctamente.")
+                # Actualizar la tabla después de eliminar
+                for item in tree.get_children():
+                    tree.delete(item)
+                perfumes = self.service.obtener_todos_los_perfumes()
+                for perfume in perfumes:
+                    id_perfume = perfume["id"]
+                    nombre = perfume["nombre"]
+                    precio = perfume["precio"] if perfume["precio"] is not None else 0.0
+                    stock = perfume["stock"] if perfume["stock"] is not None else 0
+                    tree.insert("", "end", values=(id_perfume, nombre, precio, stock))
+            else:
+                messagebox.showwarning("Advertencia", "Seleccione un perfume para eliminar.")
+
+        btn_eliminar = tk.Button(ventana, text="Eliminar Perfume", command=eliminar_perfume)
+        btn_eliminar.pack(pady=10)
+
+        # Botón para editar perfume
+        def editar_perfume():
+            seleccionado = tree.selection()  # Obtener el perfume seleccionado
+            if seleccionado:
+                perfume_id = tree.item(seleccionado, "values")[0]  # Obtener el ID del perfume
+                self.mostrar_editar_perfume(perfume_id)  # Pasar la función de actualización
+            else:
+                messagebox.showwarning("Advertencia", "Seleccione un perfume para editar.")
+
+        btn_editar = tk.Button(ventana, text="Editar Perfume", command=editar_perfume)
+        btn_editar.pack(pady=10)
+
+        # Botón para cerrar la ventana
+        btn_cerrar = tk.Button(ventana, text="Cerrar", command=ventana.destroy)
+        btn_cerrar.pack(pady=10)
+
+    def mostrar_editar_perfume(self, perfume_id: int):
+        # Obtener los datos del perfume desde el servicio
+        perfume = self.service.obtener_perfume_por_id(perfume_id)
+
+        # Crear una ventana para editar el perfume
+        ventana_editar = tk.Toplevel()
+        ventana_editar.title("Editar Perfume")
+
+        # Campos para editar
+        tk.Label(ventana_editar, text="Nombre:").grid(row=0, column=0)
+        entry_nombre = tk.Entry(ventana_editar)
+        entry_nombre.grid(row=0, column=1)
+        entry_nombre.insert(0, perfume["nombre"])
+
+        tk.Label(ventana_editar, text="Precio:").grid(row=1, column=0)
+        entry_precio = tk.Entry(ventana_editar)
+        entry_precio.grid(row=1, column=1)
+        entry_precio.insert(0, perfume["precio"])
+
+        tk.Label(ventana_editar, text="Stock:").grid(row=2, column=0)
+        entry_stock = tk.Entry(ventana_editar)
+        entry_stock.grid(row=2, column=1)
+        entry_stock.insert(0, perfume["stock"])
+
+        # Función para guardar los cambios
+        def guardar_cambios():
+            nuevo_nombre = entry_nombre.get()
+            nuevo_precio = entry_precio.get()
+            nuevo_stock = entry_stock.get()
+            self.service.editar_perfume(perfume_id, nuevo_nombre, nuevo_precio, nuevo_stock)
+            messagebox.showinfo("Éxito", "Perfume actualizado correctamente.")
+            ventana_editar.destroy()  # Cerrar la ventana de edición
+            self.mostrar_todos_los_perfumes()  # Actualizar la tabla de perfumes
+
+        btn_guardar = tk.Button(ventana_editar, text="Guardar Cambios", command=guardar_cambios)
+        btn_guardar.grid(row=3, columnspan=2, pady=10)
+
     def mostrar_crear_factura(self):
         # Ventana para crear factura
         ventana = tk.Toplevel()
