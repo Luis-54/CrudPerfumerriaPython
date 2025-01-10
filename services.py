@@ -43,7 +43,7 @@ class FacturacionService:
         except Exception as e:
             print(f"Error al eliminar cliente: {e}")
 
-    def editar_cliente(self, cliente_id: int, nombre: str, telefono: str, habitual: str):
+    def editar_cliente(self, cliente_id: int, nombre: str, telefono: str, habitual: bool):  # Asegúrate de que esté dentro de la clase
         try:
             cursor = self.db.cursor()
             cursor.execute('''

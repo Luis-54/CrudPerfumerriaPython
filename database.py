@@ -10,10 +10,10 @@ def inicializar_db(db: sqlite3.Connection):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT,
             telefono TEXT,
-            habitual BOOLEAN
+            habitual INTEGER  -- Usar INTEGER para booleanos (0 = No, 1 = Sí)
         )
     ''')
-def inicializar_db(db: sqlite3.Connection):
+
     db.execute('''
         CREATE TABLE IF NOT EXISTS Perfumes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,14 +22,16 @@ def inicializar_db(db: sqlite3.Connection):
             stock INTEGER  -- Nueva columna para el stock
         )
     ''')
+
     db.execute('''
         CREATE TABLE IF NOT EXISTS Facturas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    cliente_id INTEGER,
-    total REAL,
-    FOREIGN KEY(cliente_id) REFERENCES Clientes(id)
-);
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cliente_id INTEGER,
+            total REAL,
+            FOREIGN KEY(cliente_id) REFERENCES Clientes(id)
+        )
     ''')
+
     db.execute('''
         CREATE TABLE IF NOT EXISTS DetallesFactura (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,4 +43,5 @@ def inicializar_db(db: sqlite3.Connection):
             FOREIGN KEY(perfume_id) REFERENCES Perfumes(id)
         )
     ''')
+
     db.commit()

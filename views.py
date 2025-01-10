@@ -133,7 +133,7 @@ class FacturacionView:
         def guardar_cambios():
             nuevo_nombre = entry_nombre.get()
             nuevo_telefono = entry_telefono.get()
-            nuevo_habitual = entry_habitual.get() == "Sí"
+            nuevo_habitual = entry_habitual.get() == "Sí"  # Convertir a booleano
             self.service.editar_cliente(cliente_id, nuevo_nombre, nuevo_telefono, nuevo_habitual)
             messagebox.showinfo("Éxito", "Cliente actualizado correctamente.")
             actualizar_tabla()  # Actualizar la tabla después de editar
