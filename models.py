@@ -13,9 +13,10 @@ class Perfume:
         self.stock = stock
 
 class Factura:
-    def __init__(self, cliente: Cliente = None, total: float = 0):
+    def __init__(self, cliente: Cliente = None, total: float = 0, fecha: str = None):
         self.cliente = cliente
         self.total = total
+        self.fecha = fecha
 
 class DetalleFactura:
     def __init__(self, factura_id: int, perfume_id: int, cantidad: int, precio: float):

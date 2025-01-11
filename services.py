@@ -14,22 +14,29 @@ class FacturacionService:
         self.db.commit()
         print("Cliente agregado correctamente.")
 
-    def obtener_todos_los_clientes(self):  # Cambia el nombre del método
+    def obtener_todos_los_clientes(self):
         cursor = self.db.cursor()
         cursor.execute('''
-            SELECT id, nombre, telefono, habitual
-            FROM Clientes
-    ''')  # Sin condición WHERE
+        SELECT id, nombre, telefono, habitual
+        FROM Clientes
+        ''')
         clientes = cursor.fetchall()
+
+        # Depuración: imprime los datos crudos obtenidos de la base de datos
+        print("Datos crudos obtenidos de la base de datos:", clientes)
+
+        # Procesar los datos
         return [
         {
             "id": cliente[0],
-            "nombre": cliente[1],
-            "telefono": cliente[2],
-            "habitual": "Sí" if cliente[3] else "No"  # Convertir a texto
+            "nombre": cliente[1] if cliente[1] else "Sin nombre",
+            "telefono": cliente[2] if cliente[2] else "Sin teléfono",
+            "habitual": "Sí" if cliente[3] == 1 else "No"
         }
         for cliente in clientes
     ]
+
+
 
     def eliminar_cliente(self, cliente_id: int):
         try:
@@ -43,7 +50,7 @@ class FacturacionService:
         except Exception as e:
             print(f"Error al eliminar cliente: {e}")
 
-    def editar_cliente(self, cliente_id: int, nombre: str, telefono: str, habitual: bool):  # Asegúrate de que esté dentro de la clase
+    def editar_cliente(self, cliente_id: int, nombre: str, telefono: str, habitual: bool):
         try:
             cursor = self.db.cursor()
             cursor.execute('''
@@ -69,9 +76,10 @@ class FacturacionService:
                 "id": cliente[0],
                 "nombre": cliente[1],
                 "telefono": cliente[2],
-                "habitual": "Sí" if cliente[3] else "No"  # Convertir a texto
+                "habitual": "Sí" if cliente[3] else "No"
             }
         return None
+
 
     def editar_cliente(self, cliente_id: int, nombre: str, telefono: str, habitual: str):  # Asegúrate de que esté dentro de la clase
         try:
@@ -98,23 +106,28 @@ class FacturacionService:
         except Exception as e:
             print(f"Error al agregar perfume: {e}")
 
-    def obtener_todos_los_perfumes(self):
+    def obtener_todos_los_clientes(self):
         cursor = self.db.cursor()
         cursor.execute('''
-        SELECT id, nombre, precio, stock
-        FROM Perfumes
-    ''')  # Sin condición WHERE
-        perfumes = cursor.fetchall()
-        print("Perfumes obtenidos de la base de datos:", perfumes)  # Depuración
+        SELECT id, nombre, telefono, habitual
+        FROM Clientes
+    ''')
+        clientes = cursor.fetchall()
+
+        # Depuración: imprime los datos crudos obtenidos de la base de datos
+        print("Datos crudos obtenidos de la base de datos:", clientes)
+
+        # Procesar los datos
         return [
         {
-            "id": perfume[0],
-            "nombre": perfume[1],
-            "precio": perfume[2],
-            "stock": perfume[3]
+            "id": cliente[0],
+            "nombre": cliente[1] if cliente[1] else "Sin nombre",
+            "telefono": cliente[2] if cliente[2] else "Sin teléfono",
+            "habitual": "Sí" if cliente[3] == 1 else "No"
         }
-        for perfume in perfumes
+        for cliente in clientes
     ]
+
 
     def editar_perfume(self, perfume_id: int, nombre: str, precio: float, stock: int):
         try:
@@ -159,48 +172,112 @@ class FacturacionService:
         except Exception as e:
             print(f"Error al eliminar perfume: {e}")
 
-    def crear_factura(self, factura: Factura, detalles: list[DetalleFactura]):
-        cursor = self.db.cursor()
-        # Insertar la factura
-        cursor.execute('''
-            INSERT INTO Facturas (cliente_id, total)
-            VALUES (?, ?)
-        ''', (factura.cliente.id if factura.cliente else None, factura.total))
-        factura_id = cursor.lastrowid
+    def crear_factura(self, cliente_id, fecha, total, detalles):
+        try:
+            # Insertar la factura principal
+            cursor = self.db.cursor()
+            cursor.execute("""
+                INSERT INTO Facturas (cliente_id, fecha, total)
+                VALUES (?, ?, ?)
+            """, (cliente_id, fecha, total))
+            
+            # Obtener el ID de la factura recién creada
+            factura_id = cursor.lastrowid
+            
+            # Insertar los detalles de la factura
+            for detalle in detalles:
+                cursor.execute("""
+                    INSERT INTO DetallesFactura (factura_id, perfume_id, cantidad, precio)
+                    VALUES (?, ?, ?, ?)
+                """, (factura_id, detalle['perfume_id'], detalle['cantidad'], detalle['precio_unitario']))
+            
+            self.db.commit()
+            return factura_id
+        except Exception as e:
+            self.db.rollback()
+            raise Exception(f"Error al crear la factura: {str(e)}")
 
-        # Insertar los detalles de la factura
-        for detalle in detalles:
-            cursor.execute('''
-                INSERT INTO DetallesFactura (factura_id, perfume_id, cantidad, precio)
-                VALUES (?, ?, ?, ?)
-            ''', (factura_id, detalle.perfume_id, detalle.cantidad, detalle.precio))
-
-        self.db.commit()
-        print("Factura creada correctamente.")
-
-    def obtener_factura(self, factura_id: int):
-        cursor = self.db.cursor()
-        cursor.execute('''
-            SELECT * FROM Facturas WHERE id = ?
-        ''', (factura_id,))
-        factura = cursor.fetchone()
-        if factura:
-            return Factura(cliente=None, total=factura[2])  # Ajusta según tu modelo
-        return None
-    
-    def obtener_todas_las_facturas(self):
+    def obtener_todos_los_clientes(self):
         cursor = self.db.cursor()
         cursor.execute('''
-            SELECT Facturas.id, Clientes.nombre, Facturas.total
-            FROM Facturas
-            LEFT JOIN Clientes ON Facturas.cliente_id = Clientes.id
-        ''')
-        facturas = cursor.fetchall()
+        SELECT id, nombre, telefono, habitual
+        FROM Clientes
+    ''')
+        clientes = cursor.fetchall()
+
+    # Depuración: imprime los datos crudos obtenidos de la base de datos
+        print("Datos crudos obtenidos de la base de datos:", clientes)
+
+    # Procesar los datos
         return [
-            {
-                "id": factura[0],
-                "cliente": factura[1] if factura[1] else "Cliente no especificado",
-                "total": factura[2]
-            }
-            for factura in facturas
-        ]
+        {
+            "id": cliente[0],
+            "nombre": cliente[1] if cliente[1] else "Sin nombre",
+            "telefono": cliente[2] if cliente[2] else "Sin teléfono",
+            "habitual": "Sí" if cliente[3] == 1 else "No"
+        }
+        for cliente in clientes
+    ]
+
+
+    def obtener_todos_los_perfumes(self):
+        cursor = self.db.cursor()
+        cursor.execute('''
+        SELECT id, nombre, precio, stock
+        FROM Perfumes
+        ''')
+        perfumes = cursor.fetchall()
+
+    # Depuración: imprime los datos crudos obtenidos de la base de datos
+        print("Datos crudos obtenidos de la base de datos de perfumes:", perfumes)
+
+    # Procesar y devolver los datos
+        return [
+        {
+            "id": perfume[0],
+            "nombre": perfume[1] if perfume[1] else "Sin nombre",
+            "precio": perfume[2] if perfume[2] is not None else 0.0,
+            "stock": perfume[3] if perfume[3] is not None else 0
+        }
+        for perfume in perfumes
+    ]
+
+    def obtener_facturas(self):
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("""
+                SELECT f.id, c.nombre, f.fecha, f.total 
+                FROM Facturas f
+                JOIN Clientes c ON f.cliente_id = c.id
+                ORDER BY f.fecha DESC
+            """)
+            facturas = cursor.fetchall()
+            
+            return [{
+                'id': f[0],
+                'cliente_nombre': f[1],
+                'fecha': f[2],
+                'total': f[3]
+            } for f in facturas]
+        except Exception as e:
+            raise Exception(f"Error al obtener facturas: {str(e)}")
+
+    def obtener_detalles_factura(self, factura_id):
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("""
+                SELECT p.nombre, d.cantidad, d.precio, (d.cantidad * d.precio) as subtotal
+                FROM DetallesFactura d
+                JOIN Perfumes p ON d.perfume_id = p.id
+                WHERE d.factura_id = ?
+            """, (factura_id,))
+            detalles = cursor.fetchall()
+            
+            return [{
+                'perfume_nombre': d[0],
+                'cantidad': d[1],
+                'precio_unitario': d[2],
+                'subtotal': d[3]
+            } for d in detalles]
+        except Exception as e:
+            raise Exception(f"Error al obtener detalles: {str(e)}")

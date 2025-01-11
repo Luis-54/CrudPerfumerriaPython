@@ -23,15 +23,18 @@ def inicializar_db(db: sqlite3.Connection):
         )
     ''')
 
+    # Crear tabla principal de Facturas
     db.execute('''
         CREATE TABLE IF NOT EXISTS Facturas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             cliente_id INTEGER,
-            total REAL,
+            total REAL NOT NULL,
+            fecha TEXT NOT NULL,
             FOREIGN KEY(cliente_id) REFERENCES Clientes(id)
         )
     ''')
 
+    # Crear tabla de detalles de factura (usar DetallesFactura en plural)
     db.execute('''
         CREATE TABLE IF NOT EXISTS DetallesFactura (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,5 +46,4 @@ def inicializar_db(db: sqlite3.Connection):
             FOREIGN KEY(perfume_id) REFERENCES Perfumes(id)
         )
     ''')
-
     db.commit()
